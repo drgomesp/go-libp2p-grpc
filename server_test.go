@@ -87,6 +87,8 @@ func TestGrpcBadProtocol(t *testing.T) {
 
 	client := libp2pgrpc.NewClient(cliHost, "/bad/proto")
 	conn, err := client.Dial(ctx, srvHost.ID(), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	assert.NoError(t, err)
+	assert.NotNil(t, conn)
 
 	c := proto.NewEchoServiceClient(conn)
 	res, err := c.Echo(ctx, &proto.EchoRequest{Message: "some message"})
