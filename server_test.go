@@ -2,7 +2,6 @@ package libp2pgrpc_test
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"testing"
 
@@ -65,31 +64,4 @@ func TestGrpc(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, "some message comes from here", res.Message)
-}
-
-func TestGrpcDialBadProtocol(t *testing.T) {
-	ctx := context.Background()
-
-	m1, _ := multiaddr.NewMultiaddr("/ip4/127.0.0.1/tcp/10000")
-	m2, _ := multiaddr.NewMultiaddr("/ip4/127.0.0.1/tcp/10001")
-
-	srvHost := newHost(t, m1)
-	defer srvHost.Close()
-
-	cliHost := newHost(t, m2)
-	defer cliHost.Close()
-
-	srvHost.Peerstore().AddAddrs(cliHost.ID(), cliHost.Addrs(), peerstore.PermanentAddrTTL)
-	cliHost.Peerstore().AddAddrs(srvHost.ID(), srvHost.Addrs(), peerstore.PermanentAddrTTL)
-
-	srv, err := libp2pgrpc.NewGrpcServer(ctx, srvHost)
-	assert.NoError(t, err)
-	pb.RegisterEchoServiceServer(srv, &GreeterService{})
-
-	client := libp2pgrpc.NewClient(cliHost, "/bad/protocol", libp2pgrpc.WithServer(srv))
-	conn, err := client.Dial(ctx, srvHost.ID(), grpc.WithTransportCredentials(insecure.NewCredentials()))
-	assert.Error(t, err)
-	_ = conn
-
-	assert.Equal(t, errors.New("protocol not supported"), err)
 }
