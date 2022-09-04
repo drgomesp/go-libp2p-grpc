@@ -1,7 +1,11 @@
 ignore:
-  - "examples/echo/**"
-  - "pb/examples/echo/**"
+  - "examples"
+  - "pb"
+
 coverage:
+  ignore:
+    - "examples"
+    - "pb"
   status:
     project:
       default:
