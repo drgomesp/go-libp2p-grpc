@@ -4,7 +4,7 @@
 // - protoc             (unknown)
 // source: examples/echo/proto/echo.proto
 
-package echo
+package proto
 
 import (
 	context "context"

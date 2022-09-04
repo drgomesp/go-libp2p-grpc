@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package echosvc.pb;
 
-option go_package = "github.com/drgomesp/go-libp2p-grpc/proto/examples/echo";
+option go_package = "github.com/drgomesp/go-libp2p-grpc/proto/examples/echo/proto";
 
 // EchoRequest is the argument to the Echo call.
 message EchoRequest {
