@@ -20,9 +20,7 @@ Coming soon...
 
 ## Usage
 
-```
-Coming soon...
-```
+See [examples/](https://github.com/drgomesp/go-libp2p-grpc/tree/main/examples/echo) folder.
 
 ## Contributing
 
