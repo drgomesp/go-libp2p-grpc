@@ -65,3 +65,33 @@ func TestGrpc(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "some message comes from here", res.Message)
 }
+
+func TestGrpcBadProtocol(t *testing.T) {
+	ctx := context.Background()
+
+	m1, _ := multiaddr.NewMultiaddr("/ip4/127.0.0.1/tcp/10000")
+	m2, _ := multiaddr.NewMultiaddr("/ip4/127.0.0.1/tcp/10001")
+
+	srvHost := newHost(t, m1)
+	defer srvHost.Close()
+
+	cliHost := newHost(t, m2)
+	defer cliHost.Close()
+
+	srvHost.Peerstore().AddAddrs(cliHost.ID(), cliHost.Addrs(), peerstore.PermanentAddrTTL)
+	cliHost.Peerstore().AddAddrs(srvHost.ID(), srvHost.Addrs(), peerstore.PermanentAddrTTL)
+
+	srv, err := libp2pgrpc.NewGrpcServer(ctx, srvHost)
+	assert.NoError(t, err)
+	proto.RegisterEchoServiceServer(srv, &GreeterService{})
+
+	client := libp2pgrpc.NewClient(cliHost, "/bad/proto")
+	conn, err := client.Dial(ctx, srvHost.ID(), grpc.WithTransportCredentials(insecure.NewCredentials()))
+
+	c := proto.NewEchoServiceClient(conn)
+	res, err := c.Echo(ctx, &proto.EchoRequest{Message: "some message"})
+
+	assert.Nil(t, res)
+	assert.Error(t, err)
+	assert.Equal(t, "rpc error: code = Unavailable desc = connection error: desc = \"transport: Error while dialing protocol not supported\"", err.Error())
+}
