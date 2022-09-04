@@ -74,7 +74,9 @@ Dial the server and initiate the request:
 ```go
 client := libp2pgrpc.NewClient(cliHost, libp2pgrpc.ProtocolID, libp2pgrpc.WithServer(srv))
 conn, err := client.Dial(ctx, serverHost.ID(), grpc.WithTransportCredentials(insecure.NewCredentials()))
-assert.NoError(t, err)
+if err != nil {
+log.Fatal(err)
+}
 defer conn.Close()
 
 c := pb.NewEchoServiceClient(conn)
