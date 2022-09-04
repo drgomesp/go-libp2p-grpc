@@ -1,5 +1,5 @@
 ignore:
-  - "examples"
+  - "examples/echo/proto"
   - "proto"
 coverage:
   status:
