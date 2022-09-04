@@ -1,5 +1,48 @@
 package main
 
+import (
+	"context"
+	"log"
+
+	"github.com/libp2p/go-libp2p"
+	"github.com/libp2p/go-libp2p/core/peerstore"
+	"github.com/multiformats/go-multiaddr"
+
+	libp2pgrpc "github.com/drgomesp/go-libp2p-grpc"
+	pb "github.com/drgomesp/go-libp2p-grpc/pb/examples/echo"
+)
+
+type EchoService struct {
+	pb.UnimplementedEchoServiceServer
+}
+
 func main() {
+	ctx := context.Background()
+
+	m1, _ := multiaddr.NewMultiaddr("/ip4/127.0.0.1/tcp/10000")
+	m2, _ := multiaddr.NewMultiaddr("/ip4/127.0.0.1/tcp/10001")
+
+	serverHost, err := libp2p.New(libp2p.ListenAddrs(m1))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	clientHost, err := libp2p.New(libp2p.ListenAddrs(m2))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer clientHost.Close()
+	defer serverHost.Close()
+
+	serverHost.Peerstore().AddAddrs(clientHost.ID(), clientHost.Addrs(), peerstore.PermanentAddrTTL)
+	clientHost.Peerstore().AddAddrs(serverHost.ID(), serverHost.Addrs(), peerstore.PermanentAddrTTL)
+
+	srv, err := libp2pgrpc.NewGrpcServer(ctx, serverHost)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	pb.RegisterEchoServiceServer(srv, &EchoService{})
 
 }

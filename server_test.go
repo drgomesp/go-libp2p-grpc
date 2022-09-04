@@ -55,7 +55,6 @@ func TestGrpc(t *testing.T) {
 	pb.RegisterEchoServiceServer(srv, &GreeterService{})
 
 	client := libp2pgrpc.NewClient(cliHost, libp2pgrpc.ProtocolID, libp2pgrpc.WithServer(srv))
-
 	conn, err := client.Dial(ctx, srvHost.ID(), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	assert.NoError(t, err)
 	defer conn.Close()
