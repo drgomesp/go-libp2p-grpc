@@ -14,7 +14,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	libp2pgrpc "github.com/drgomesp/go-libp2p-grpc"
-	pb "github.com/drgomesp/go-libp2p-grpc/pb/examples/echo"
+	pb "github.com/drgomesp/go-libp2p-grpc/proto/examples/echo"
 )
 
 type GreeterService struct {

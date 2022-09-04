@@ -1,6 +1,6 @@
 ignore:
   - "examples"
-  - "pb"
+  - "proto"
 coverage:
   status:
     project:
