@@ -50,7 +50,8 @@ func TestGrpc(t *testing.T) {
 	srvHost.Peerstore().AddAddrs(cliHost.ID(), cliHost.Addrs(), peerstore.PermanentAddrTTL)
 	cliHost.Peerstore().AddAddrs(srvHost.ID(), srvHost.Addrs(), peerstore.PermanentAddrTTL)
 
-	srv := libp2pgrpc.NewGrpcServer(ctx, srvHost)
+	srv, err := libp2pgrpc.NewGrpcServer(ctx, srvHost)
+	assert.NoError(t, err)
 	pb.RegisterEchoServiceServer(srv, &GreeterService{})
 
 	client := libp2pgrpc.NewClient(cliHost, libp2pgrpc.ProtocolID, libp2pgrpc.WithServer(srv))

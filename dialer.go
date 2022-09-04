@@ -2,7 +2,6 @@ package libp2pgrpc
 
 import (
 	"context"
-	"log"
 	"net"
 
 	gostream "github.com/libp2p/go-libp2p-gostream"
@@ -14,14 +13,11 @@ func (c *Client) GetDialOption(ctx context.Context) grpc.DialOption {
 	return grpc.WithContextDialer(func(ctx context.Context, peerIdStr string) (net.Conn, error) {
 		peerID, err := peer.Decode(peerIdStr)
 		if err != nil {
-			log.Fatal(err)
-
 			return nil, err
 		}
 
 		conn, err := gostream.Dial(ctx, c.host, peerID, ProtocolID)
 		if err != nil {
-			log.Fatal(err)
 			return nil, err
 		}
 

@@ -2,7 +2,6 @@ package libp2pgrpc
 
 import (
 	"context"
-	"log"
 
 	gostream "github.com/libp2p/go-libp2p-gostream"
 	"github.com/libp2p/go-libp2p/core/host"
@@ -22,7 +21,7 @@ type Server struct {
 
 // NewGrpcServer creates a Server object with the given LibP2P host
 // and protocol.
-func NewGrpcServer(ctx context.Context, h host.Host, opts ...ServerOption) *Server {
+func NewGrpcServer(ctx context.Context, h host.Host, opts ...ServerOption) (*Server, error) {
 	grpcServer := grpc.NewServer()
 
 	srv := &Server{
@@ -37,12 +36,12 @@ func NewGrpcServer(ctx context.Context, h host.Host, opts ...ServerOption) *Serv
 
 	listener, err := gostream.Listen(srv.host, ProtocolID)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	go srv.grpc.Serve(listener)
 
-	return srv
+	return srv, nil
 }
 
 func (s *Server) RegisterService(serviceDesc *grpc.ServiceDesc, srv interface{}) {
