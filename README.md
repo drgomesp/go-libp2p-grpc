@@ -14,8 +14,8 @@
 
 ## Install
 
-```
-Coming soon...
+```bash
+go get github.com/drgomesp/go-libp2p-grpc
 ```
 
 ## Usage
