@@ -61,7 +61,7 @@ pb.RegisterEchoServiceServer(srv, &EchoService{})
 
 A libp2p host to act as the client:
 ```go
-ma, _ := multiaddr.NewMultiaddr("/ip4/127.0.0.1/tcp/10000")
+ma, _ := multiaddr.NewMultiaddr("/ip4/127.0.0.1/tcp/10001")
 
 clientHost, err := libp2p.New(libp2p.ListenAddrs(ma))
 if err != nil {
@@ -73,7 +73,7 @@ Dial the server and initiate the request:
 
 ```go
 client := libp2pgrpc.NewClient(cliHost, libp2pgrpc.ProtocolID, libp2pgrpc.WithServer(srv))
-conn, err := client.Dial(ctx, srvHost.ID(), grpc.WithTransportCredentials(insecure.NewCredentials()))
+conn, err := client.Dial(ctx, serverHost.ID(), grpc.WithTransportCredentials(insecure.NewCredentials()))
 assert.NoError(t, err)
 defer conn.Close()
 

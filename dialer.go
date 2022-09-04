@@ -16,7 +16,7 @@ func (c *Client) GetDialOption(ctx context.Context) grpc.DialOption {
 			return nil, err
 		}
 
-		conn, err := gostream.Dial(ctx, c.host, peerID, ProtocolID)
+		conn, err := gostream.Dial(ctx, c.host, peerID, c.protocol)
 		if err != nil {
 			return nil, err
 		}
