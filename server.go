@@ -6,7 +6,6 @@ import (
 
 	gostream "github.com/libp2p/go-libp2p-gostream"
 	"github.com/libp2p/go-libp2p/core/host"
-	"github.com/libp2p/go-libp2p/core/network"
 	"google.golang.org/grpc"
 )
 
@@ -16,15 +15,14 @@ type ServerOption func(*Server)
 var _ grpc.ServiceRegistrar = &Server{}
 
 type Server struct {
-	host   host.Host
-	grpc   *grpc.Server
-	ctx    context.Context
-	stream chan network.Stream
+	host host.Host
+	grpc *grpc.Server
+	ctx  context.Context
 }
 
 // NewGrpcServer creates a Server object with the given LibP2P host
 // and protocol.
-func NewGrpcServer(ctx context.Context, h host.Host, opts ...ServerOption) *Server {
+func NewGrpcServer(_ context.Context, h host.Host, opts ...ServerOption) *Server {
 	grpcServer := grpc.NewServer()
 
 	srv := &Server{
