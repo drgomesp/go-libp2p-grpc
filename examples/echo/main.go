@@ -7,6 +7,8 @@ import (
 	"github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p/core/peerstore"
 	"github.com/multiformats/go-multiaddr"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	libp2pgrpc "github.com/drgomesp/go-libp2p-grpc"
 	pb "github.com/drgomesp/go-libp2p-grpc/pb/examples/echo"
@@ -14,6 +16,13 @@ import (
 
 type EchoService struct {
 	pb.UnimplementedEchoServiceServer
+}
+
+func (s *EchoService) Echo(context.Context, *pb.EchoRequest) (*pb.EchoReply, error) {
+	return &pb.EchoReply{
+		Message: "heyo!",
+		PeerId:  "123",
+	}, nil
 }
 
 func main() {
@@ -44,5 +53,17 @@ func main() {
 	}
 
 	pb.RegisterEchoServiceServer(srv, &EchoService{})
+	client := libp2pgrpc.NewClient(clientHost, libp2pgrpc.ProtocolID, libp2pgrpc.WithServer(srv))
+	conn, err := client.Dial(ctx, serverHost.ID(), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatal(err)
+	}
 
+	c := pb.NewEchoServiceClient(conn)
+	res, err := c.Echo(ctx, &pb.EchoRequest{Message: "give me something"})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println(res.Message)
 }
