@@ -78,7 +78,7 @@ assert.NoError(t, err)
 defer conn.Close()
 
 c := pb.NewEchoServiceClient(conn)
-res, err := c.Echo(ctx, &pb.EchoRequest{Message: "here's your response"})
+res, err := c.Echo(ctx, &pb.EchoRequest{Message: "give me something"})
 ```
 
 ## Contributing
