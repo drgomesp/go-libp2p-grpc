@@ -22,6 +22,8 @@ go get github.com/drgomesp/go-libp2p-grpc
 
 ## Usage
 
+> For a working example, check the **[examples/](https://github.com/drgomesp/go-libp2p-grpc/tree/main/examples)** folder.
+
 Given an RPC service:
 
 ```proto
