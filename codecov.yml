@@ -1,12 +1,6 @@
 ignore:
-  - pb
-  - examples
-  -
+  - "examples"
+  - "pb"
 coverage:
   status:
     project:
-      default:
-        informational: true
-    patch:
-      default:
-        informational: true
