@@ -8,4 +8,4 @@ on:
 
 jobs:
   releaser:
-    uses: protocol/.github/.github/workflows/releaser.yml@main
+    uses: protocol/.github/.github/workflows/releaser.yml@master
