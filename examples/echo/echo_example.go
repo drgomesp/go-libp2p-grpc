@@ -11,15 +11,15 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	libp2pgrpc "github.com/drgomesp/go-libp2p-grpc"
-	pb "github.com/drgomesp/go-libp2p-grpc/proto/examples/echo"
+	"github.com/drgomesp/go-libp2p-grpc/examples/echo/proto/examples/echo"
 )
 
 type EchoService struct {
-	pb.UnimplementedEchoServiceServer
+	proto.UnimplementedEchoServiceServer
 }
 
-func (s *EchoService) Echo(context.Context, *pb.EchoRequest) (*pb.EchoReply, error) {
-	return &pb.EchoReply{
+func (s *EchoService) Echo(context.Context, *proto.EchoRequest) (*proto.EchoReply, error) {
+	return &proto.EchoReply{
 		Message: "heyo!",
 		PeerId:  "123",
 	}, nil
@@ -52,15 +52,15 @@ func main() {
 		log.Fatal(err)
 	}
 
-	pb.RegisterEchoServiceServer(srv, &EchoService{})
+	proto.RegisterEchoServiceServer(srv, &EchoService{})
 	client := libp2pgrpc.NewClient(clientHost, libp2pgrpc.ProtocolID, libp2pgrpc.WithServer(srv))
 	conn, err := client.Dial(ctx, serverHost.ID(), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	c := pb.NewEchoServiceClient(conn)
-	res, err := c.Echo(ctx, &pb.EchoRequest{Message: "give me something"})
+	c := proto.NewEchoServiceClient(conn)
+	res, err := c.Echo(ctx, &proto.EchoRequest{Message: "give me something"})
 	if err != nil {
 		log.Fatal(err)
 	}

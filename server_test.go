@@ -14,15 +14,15 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	libp2pgrpc "github.com/drgomesp/go-libp2p-grpc"
-	pb "github.com/drgomesp/go-libp2p-grpc/proto/examples/echo"
+	"github.com/drgomesp/go-libp2p-grpc/examples/echo/proto/examples/echo"
 )
 
 type GreeterService struct {
-	pb.UnimplementedEchoServiceServer
+	proto.UnimplementedEchoServiceServer
 }
 
-func (s *GreeterService) Echo(ctx context.Context, req *pb.EchoRequest) (*pb.EchoReply, error) {
-	return &pb.EchoReply{Message: fmt.Sprintf("%s comes from here", req.GetMessage())}, nil
+func (s *GreeterService) Echo(ctx context.Context, req *proto.EchoRequest) (*proto.EchoReply, error) {
+	return &proto.EchoReply{Message: fmt.Sprintf("%s comes from here", req.GetMessage())}, nil
 }
 
 func newHost(t *testing.T, listen multiaddr.Multiaddr) host.Host {
@@ -52,15 +52,15 @@ func TestGrpc(t *testing.T) {
 
 	srv, err := libp2pgrpc.NewGrpcServer(ctx, srvHost)
 	assert.NoError(t, err)
-	pb.RegisterEchoServiceServer(srv, &GreeterService{})
+	proto.RegisterEchoServiceServer(srv, &GreeterService{})
 
 	client := libp2pgrpc.NewClient(cliHost, libp2pgrpc.ProtocolID, libp2pgrpc.WithServer(srv))
 	conn, err := client.Dial(ctx, srvHost.ID(), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	assert.NoError(t, err)
 	defer conn.Close()
 
-	c := pb.NewEchoServiceClient(conn)
-	res, err := c.Echo(ctx, &pb.EchoRequest{Message: "some message"})
+	c := proto.NewEchoServiceClient(conn)
+	res, err := c.Echo(ctx, &proto.EchoRequest{Message: "some message"})
 
 	assert.NoError(t, err)
 	assert.Equal(t, "some message comes from here", res.Message)
