@@ -22,11 +22,12 @@ type Server struct {
 
 // NewGrpcServer creates a Server object with the given LibP2P host
 // and protocol.
-func NewGrpcServer(_ context.Context, h host.Host, opts ...ServerOption) *Server {
+func NewGrpcServer(ctx context.Context, h host.Host, opts ...ServerOption) *Server {
 	grpcServer := grpc.NewServer()
 
 	srv := &Server{
 		host: h,
+		ctx:  ctx,
 		grpc: grpcServer,
 	}
 
