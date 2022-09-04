@@ -45,16 +45,6 @@ func NewGrpcServer(ctx context.Context, h host.Host, opts ...ServerOption) *Serv
 	return srv
 }
 
-func (s *Server) GRPC() grpc.ServiceRegistrar {
-	return s.grpc
-}
-
-func (s *Server) Register(svc *grpc.ServiceDesc) error {
-	s.grpc.RegisterService(svc, s.grpc)
-
-	return nil
-}
-
 func (s *Server) RegisterService(serviceDesc *grpc.ServiceDesc, srv interface{}) {
 	s.grpc.RegisterService(serviceDesc, srv)
 }
