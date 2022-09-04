@@ -8,9 +8,6 @@ import (
 	"google.golang.org/grpc"
 )
 
-// ServerOption allows for functional setting of options on a Server.
-type ServerOption func(*Server)
-
 var _ grpc.ServiceRegistrar = &Server{}
 
 type Server struct {
@@ -21,17 +18,13 @@ type Server struct {
 
 // NewGrpcServer creates a Server object with the given LibP2P host
 // and protocol.
-func NewGrpcServer(ctx context.Context, h host.Host, opts ...ServerOption) (*Server, error) {
-	grpcServer := grpc.NewServer()
+func NewGrpcServer(ctx context.Context, h host.Host, opts ...grpc.ServerOption) (*Server, error) {
+	grpcServer := grpc.NewServer(opts...)
 
 	srv := &Server{
 		host: h,
 		ctx:  ctx,
 		grpc: grpcServer,
-	}
-
-	for _, opt := range opts {
-		opt(srv)
 	}
 
 	listener, err := gostream.Listen(srv.host, ProtocolID)

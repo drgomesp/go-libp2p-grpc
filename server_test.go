@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p/core/host"
@@ -12,6 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/keepalive"
 
 	libp2pgrpc "github.com/drgomesp/go-libp2p-grpc"
 	"github.com/drgomesp/go-libp2p-grpc/examples/echo/proto"
@@ -50,7 +52,11 @@ func TestGrpc(t *testing.T) {
 	srvHost.Peerstore().AddAddrs(cliHost.ID(), cliHost.Addrs(), peerstore.PermanentAddrTTL)
 	cliHost.Peerstore().AddAddrs(srvHost.ID(), srvHost.Addrs(), peerstore.PermanentAddrTTL)
 
-	srv, err := libp2pgrpc.NewGrpcServer(ctx, srvHost)
+	srv, err := libp2pgrpc.NewGrpcServer(ctx, srvHost, grpc.KeepaliveParams(keepalive.ServerParameters{
+		Time:    time.Second,
+		Timeout: 100 * time.Millisecond,
+	}))
+
 	assert.NoError(t, err)
 	proto.RegisterEchoServiceServer(srv, &GreeterService{})
 
