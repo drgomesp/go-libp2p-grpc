@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-func (c *Client) GetDialOption(ctx context.Context) grpc.DialOption {
+func (c *Client) GetDialOption(_ context.Context) grpc.DialOption {
 	return grpc.WithContextDialer(func(ctx context.Context, peerIdStr string) (net.Conn, error) {
 		peerID, err := peer.Decode(peerIdStr)
 		if err != nil {
@@ -25,11 +25,7 @@ func (c *Client) GetDialOption(ctx context.Context) grpc.DialOption {
 	})
 }
 
-func (c *Client) Dial(
-	ctx context.Context,
-	peerID peer.ID,
-	dialOpts ...grpc.DialOption,
-) (*grpc.ClientConn, error) {
+func (c *Client) Dial(ctx context.Context, peerID peer.ID, dialOpts ...grpc.DialOption, ) (*grpc.ClientConn, error) {
 	dialOpsPrepended := append([]grpc.DialOption{c.GetDialOption(ctx)}, dialOpts...)
 	return grpc.DialContext(ctx, peerID.String(), dialOpsPrepended...)
 }

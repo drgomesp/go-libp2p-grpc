@@ -1,4 +1,5 @@
 ignore:
+  - examples/
   - pb/
 coverage:
   status:

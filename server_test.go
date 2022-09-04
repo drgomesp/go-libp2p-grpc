@@ -23,7 +23,7 @@ type GreeterService struct {
 }
 
 func (s *GreeterService) Echo(ctx context.Context, req *pb.EchoRequest) (*pb.EchoReply, error) {
-	return &pb.EchoReply{Message: fmt.Sprintf("%s ja pierdole", req.GetMessage())}, nil
+	return &pb.EchoReply{Message: fmt.Sprintf("%s comes from here", req.GetMessage())}, nil
 }
 
 func newHost(t *testing.T, listen multiaddr.Multiaddr) host.Host {
@@ -61,10 +61,10 @@ func TestGrpc(t *testing.T) {
 	defer conn.Close()
 
 	c := pb.NewEchoServiceClient(conn)
-	res, err := c.Echo(ctx, &pb.EchoRequest{Message: "kurwa mać"})
+	res, err := c.Echo(ctx, &pb.EchoRequest{Message: "some message"})
 
 	assert.NoError(t, err)
-	assert.Equal(t, "kurwa mać ja pierdole", res.Message)
+	assert.Equal(t, "some message comes from here", res.Message)
 }
 
 func TestGrpcDialBadProtocol(t *testing.T) {
@@ -86,14 +86,10 @@ func TestGrpcDialBadProtocol(t *testing.T) {
 	assert.NoError(t, err)
 	pb.RegisterEchoServiceServer(srv, &GreeterService{})
 
-	client := libp2pgrpc.NewClient(cliHost, "bad protocol", libp2pgrpc.WithServer(srv))
+	client := libp2pgrpc.NewClient(cliHost, "/bad/protocol", libp2pgrpc.WithServer(srv))
 	conn, err := client.Dial(ctx, srvHost.ID(), grpc.WithTransportCredentials(insecure.NewCredentials()))
-	assert.NoError(t, err)
-	defer conn.Close()
-
-	c := pb.NewEchoServiceClient(conn)
-	res, err := c.Echo(ctx, &pb.EchoRequest{Message: "kurwa mać"})
-
 	assert.Error(t, err)
-	assert.Equal(t, errors.New("protocol not supported"), res.Message)
+	_ = conn
+
+	assert.Equal(t, errors.New("protocol not supported"), err)
 }
