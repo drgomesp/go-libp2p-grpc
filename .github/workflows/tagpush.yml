@@ -9,4 +9,4 @@ on:
 
 jobs:
   releaser:
-    uses: protocol/.github/.github/workflows/tagpush.yml@master
+    uses: protocol/.github/.github/workflows/tagpush.yml@main
