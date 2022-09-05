@@ -19,7 +19,7 @@ import (
 	"google.golang.org/grpc/keepalive"
 
 	libp2pgrpc "github.com/drgomesp/go-libp2p-grpc"
-	"github.com/drgomesp/go-libp2p-grpc/proto/v1"
+	proto "github.com/drgomesp/go-libp2p-grpc/proto/v1"
 )
 
 type GreeterService struct {
