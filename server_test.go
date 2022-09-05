@@ -1,8 +1,9 @@
 package libp2pgrpc_test
 
 import (
+	"bytes"
 	"context"
-	"fmt"
+	"encoding/json"
 	"io"
 	"net/http"
 	"testing"
@@ -22,12 +23,29 @@ import (
 	proto "github.com/drgomesp/go-libp2p-grpc/proto/v1"
 )
 
-type GreeterService struct {
-	proto.UnimplementedEchoServiceServer
+type NodeInfoService struct {
+	proto.UnimplementedNodeServiceServer
+
+	host host.Host
 }
 
-func (s *GreeterService) Echo(ctx context.Context, req *proto.EchoRequest) (*proto.EchoResponse, error) {
-	return &proto.EchoResponse{Message: fmt.Sprintf("%s comes from here", req.GetMessage())}, nil
+// Info returns information about the node service's underlying host.
+func (s *NodeInfoService) Info(context.Context, *proto.InfoRequest) (*proto.InfoResponse, error) {
+	return &proto.InfoResponse{
+		PeerId:    s.host.ID().String(),
+		Addresses: addresses(s),
+		Protocols: s.host.Mux().Protocols(),
+	}, nil
+}
+
+func addresses(s *NodeInfoService) []string {
+	res := make([]string, 0)
+
+	for _, addr := range s.host.Addrs() {
+		res = append(res, addr.String())
+	}
+
+	return res
 }
 
 func newHost(t *testing.T, listen multiaddr.Multiaddr) host.Host {
@@ -61,18 +79,21 @@ func TestGrpc(t *testing.T) {
 	}))
 
 	assert.NoError(t, err)
-	proto.RegisterEchoServiceServer(srv, &GreeterService{})
+	svc := &NodeInfoService{host: srvHost}
+	proto.RegisterNodeServiceServer(srv, svc)
 
 	client := libp2pgrpc.NewClient(cliHost, libp2pgrpc.ProtocolID, libp2pgrpc.WithServer(srv))
 	conn, err := client.Dial(ctx, srvHost.ID(), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	assert.NoError(t, err)
 	defer conn.Close()
 
-	c := proto.NewEchoServiceClient(conn)
-	res, err := c.Echo(ctx, &proto.EchoRequest{Message: "some message"})
+	c := proto.NewNodeServiceClient(conn)
+	res, err := c.Info(ctx, &proto.InfoRequest{})
 
 	assert.NoError(t, err)
-	assert.Equal(t, "some message comes from here", res.Message)
+	assert.Equal(t, srvHost.ID().String(), res.PeerId)
+	assert.Equal(t, addresses(svc), res.Addresses)
+	assert.Equal(t, srvHost.Mux().Protocols(), res.Protocols)
 }
 
 func TestGrpcGateway(t *testing.T) {
@@ -96,7 +117,8 @@ func TestGrpcGateway(t *testing.T) {
 	}))
 
 	assert.NoError(t, err)
-	proto.RegisterEchoServiceServer(srv, &GreeterService{})
+	svc := &NodeInfoService{host: srvHost}
+	proto.RegisterNodeServiceServer(srv, svc)
 
 	client := libp2pgrpc.NewClient(cliHost, libp2pgrpc.ProtocolID, libp2pgrpc.WithServer(srv))
 	conn, err := client.Dial(ctx, srvHost.ID(), grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -104,28 +126,39 @@ func TestGrpcGateway(t *testing.T) {
 	defer conn.Close()
 
 	mux := runtime.NewServeMux()
-	err = proto.RegisterEchoServiceHandler(ctx, mux, conn)
+	err = proto.RegisterNodeServiceHandler(ctx, mux, conn)
 	assert.NoError(t, err)
 
-	c := proto.NewEchoServiceClient(conn)
-	res, err := c.Echo(ctx, &proto.EchoRequest{Message: "some message"})
+	c := proto.NewNodeServiceClient(conn)
+	res, err := c.Info(ctx, &proto.InfoRequest{})
 
 	assert.NoError(t, err)
-	assert.Equal(t, "some message comes from here", res.Message)
+	assert.Equal(t, srvHost.ID().String(), res.PeerId)
+	assert.Equal(t, addresses(svc), res.Addresses)
+	assert.Equal(t, srvHost.Mux().Protocols(), res.Protocols)
 
 	go func() {
 		http.ListenAndServe(":4000", mux)
 	}()
-
 	httpClient := &http.Client{}
 	response, err := httpClient.Get(
-		"http://localhost:4000/v1/example/echo",
+		"http://localhost:4000/v1/node/info",
 	)
+	assert.NoError(t, err)
+
+	expected := &proto.InfoResponse{
+		PeerId:    srvHost.ID().String(),
+		Addresses: addresses(svc),
+		Protocols: srvHost.Mux().Protocols(),
+	}
+	expectedData, err := json.Marshal(expected)
+	var buf bytes.Buffer
+	assert.NoError(t, json.Compact(&buf, expectedData))
 	assert.NoError(t, err)
 
 	data, err := io.ReadAll(response.Body)
 	assert.NoError(t, err)
-	assert.Equal(t, `{"message":" comes from here"}`, string(data))
+	assert.Equal(t, string(expectedData), string(data))
 }
 
 func TestGrpcBadProtocol(t *testing.T) {
@@ -145,15 +178,15 @@ func TestGrpcBadProtocol(t *testing.T) {
 
 	srv, err := libp2pgrpc.NewGrpcServer(ctx, srvHost)
 	assert.NoError(t, err)
-	proto.RegisterEchoServiceServer(srv, &GreeterService{})
+	proto.RegisterNodeServiceServer(srv, &NodeInfoService{host: srvHost})
 
 	client := libp2pgrpc.NewClient(cliHost, "/bad/proto")
 	conn, err := client.Dial(ctx, srvHost.ID(), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	assert.NoError(t, err)
 	assert.NotNil(t, conn)
 
-	c := proto.NewEchoServiceClient(conn)
-	res, err := c.Echo(ctx, &proto.EchoRequest{Message: "some message"})
+	c := proto.NewNodeServiceClient(conn)
+	res, err := c.Info(ctx, &proto.InfoRequest{})
 
 	assert.Nil(t, res)
 	assert.Error(t, err)
