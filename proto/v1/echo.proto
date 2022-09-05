@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package proto.v1;
 
-option go_package = "github.com/drgomesp/go-libp2p-grpc/proto/examples/echo/proto";
+option go_package = "github.com/drgomesp/go-libp2p-grpc/proto/v1";
 
 import "google/api/annotations.proto";
 
