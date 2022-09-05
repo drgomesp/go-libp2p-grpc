@@ -94,3 +94,4 @@ PRs accepted.
 ## License
 
 MIT © [Daniel Ribeiro](https://github.com/drgomesp)
+
