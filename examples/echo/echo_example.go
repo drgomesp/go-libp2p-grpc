@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	libp2pgrpc "github.com/drgomesp/go-libp2p-grpc"
-	"github.com/drgomesp/go-libp2p-grpc/proto/v1"
+	proto "github.com/drgomesp/go-libp2p-grpc/proto/v1"
 )
 
 type EchoService struct {
