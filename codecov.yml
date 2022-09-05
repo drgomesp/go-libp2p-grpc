@@ -1,5 +1,5 @@
 ignore:
-  - "proto/v1"
+  - "proto"
 coverage:
   status:
     project:
