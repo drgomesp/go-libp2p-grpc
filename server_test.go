@@ -119,7 +119,7 @@ func TestGrpcGateway(t *testing.T) {
 
 	httpClient := &http.Client{}
 	response, err := httpClient.Get(
-		fmt.Sprintf("http://localhost:4000/v1/example/echo"),
+		"http://localhost:4000/v1/example/echo",
 	)
 	assert.NoError(t, err)
 
