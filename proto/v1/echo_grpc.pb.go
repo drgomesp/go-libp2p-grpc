@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             (unknown)
-// source: examples/echo/proto/echo.proto
+// source: proto/v1/echo.proto
 
 package proto
 
@@ -23,7 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type EchoServiceClient interface {
 	// Echo asks a node to respond with a message.
-	Echo(ctx context.Context, in *EchoRequest, opts ...grpc.CallOption) (*EchoReply, error)
+	Echo(ctx context.Context, in *EchoRequest, opts ...grpc.CallOption) (*EchoResponse, error)
 }
 
 type echoServiceClient struct {
@@ -34,9 +34,9 @@ func NewEchoServiceClient(cc grpc.ClientConnInterface) EchoServiceClient {
 	return &echoServiceClient{cc}
 }
 
-func (c *echoServiceClient) Echo(ctx context.Context, in *EchoRequest, opts ...grpc.CallOption) (*EchoReply, error) {
-	out := new(EchoReply)
-	err := c.cc.Invoke(ctx, "/echosvc.pb.EchoService/Echo", in, out, opts...)
+func (c *echoServiceClient) Echo(ctx context.Context, in *EchoRequest, opts ...grpc.CallOption) (*EchoResponse, error) {
+	out := new(EchoResponse)
+	err := c.cc.Invoke(ctx, "/proto.v1.EchoService/Echo", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func (c *echoServiceClient) Echo(ctx context.Context, in *EchoRequest, opts ...g
 // for forward compatibility
 type EchoServiceServer interface {
 	// Echo asks a node to respond with a message.
-	Echo(context.Context, *EchoRequest) (*EchoReply, error)
+	Echo(context.Context, *EchoRequest) (*EchoResponse, error)
 	mustEmbedUnimplementedEchoServiceServer()
 }
 
@@ -56,7 +56,7 @@ type EchoServiceServer interface {
 type UnimplementedEchoServiceServer struct {
 }
 
-func (UnimplementedEchoServiceServer) Echo(context.Context, *EchoRequest) (*EchoReply, error) {
+func (UnimplementedEchoServiceServer) Echo(context.Context, *EchoRequest) (*EchoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Echo not implemented")
 }
 func (UnimplementedEchoServiceServer) mustEmbedUnimplementedEchoServiceServer() {}
@@ -82,7 +82,7 @@ func _EchoService_Echo_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/echosvc.pb.EchoService/Echo",
+		FullMethod: "/proto.v1.EchoService/Echo",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(EchoServiceServer).Echo(ctx, req.(*EchoRequest))
@@ -94,7 +94,7 @@ func _EchoService_Echo_Handler(srv interface{}, ctx context.Context, dec func(in
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var EchoService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "echosvc.pb.EchoService",
+	ServiceName: "proto.v1.EchoService",
 	HandlerType: (*EchoServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -103,5 +103,5 @@ var EchoService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "examples/echo/proto/echo.proto",
+	Metadata: "proto/v1/echo.proto",
 }

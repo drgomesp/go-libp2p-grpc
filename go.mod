@@ -4,7 +4,8 @@ go 1.19
 
 require (
 	github.com/golang/protobuf v1.5.2
-	github.com/grpc-ecosystem/grpc-gateway v1.16.0
+	github.com/grpc-ecosystem/grpc-gateway v1.5.0
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.11.3
 	github.com/libp2p/go-libp2p v0.22.1-0.20220903105754-11279c65c99d
 	github.com/libp2p/go-libp2p-gostream v0.5.0
 	github.com/multiformats/go-multiaddr v0.6.0
