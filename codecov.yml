@@ -2,4 +2,6 @@ ignore:
   - "proto"
 coverage:
   status:
-    project:
+    changes: false
+    patch: true
+    project: true
