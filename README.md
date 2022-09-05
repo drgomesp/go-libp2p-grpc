@@ -23,8 +23,8 @@ go get github.com/drgomesp/go-libp2p-grpc
 
 ## Features
 
-- GRPC/Protobuf support for any Libp2p **`host.Host`**
-- GRPC Gateway and OpenAPI support through **[`go-libp2p-http`](https://github.com/libp2p/)**
+- **[GRPC/Protobuf](https://grpc.io/docs/languages/go/)** support for any Libp2p **[`host.Host`](https://github.com/libp2p/go-libp2p/blob/master/core/host/host.go#L25)**
+- **[GRPC Gateway](https://grpc-ecosystem.github.io/grpc-gateway/)** and **[OpenAPI/Swagger](https://swagger.io/specification/v2/)** support through **[`go-libp2p-http`](https://github.com/libp2p/)**
 
 ## Usage
 
