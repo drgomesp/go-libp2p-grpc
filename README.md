@@ -23,10 +23,11 @@ go get github.com/drgomesp/go-libp2p-grpc
 
 ## Features
 
-- **[GRPC/Protobuf](https://grpc.io/docs/languages/go/)** support for any Libp2p **[`host.Host`](https://github.com/libp2p/go-libp2p/blob/master/core/host/host.go#L25)**
-- **[GRPC Gateway](https://grpc-ecosystem.github.io/grpc-gateway/)** and **[OpenAPI/Swagger](https://swagger.io/specification/v2/)** support through **[`go-libp2p-http`](https://github.com/libp2p/)**
+- [x] **[GRPC/Protobuf](https://grpc.io/docs/languages/go/)** support for any Libp2p **[`host.Host`](https://github.com/libp2p/go-libp2p/blob/master/core/host/host.go#L25)**
+- [x] **[GRPC Gateway](https://grpc-ecosystem.github.io/grpc-gateway/)** and **[OpenAPI/Swagger](https://swagger.io/specification/v2/)** support through **[`go-libp2p-http`](https://github.com/libp2p/)**
 
 ## Usage
+
 
 > For a working example, check the **[examples/](https://github.com/drgomesp/go-libp2p-grpc/tree/main/examples)** folder.
 
