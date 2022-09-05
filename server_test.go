@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/peerstore"
@@ -19,15 +19,15 @@ import (
 	"google.golang.org/grpc/keepalive"
 
 	libp2pgrpc "github.com/drgomesp/go-libp2p-grpc"
-	"github.com/drgomesp/go-libp2p-grpc/examples/echo/proto"
+	"github.com/drgomesp/go-libp2p-grpc/proto/v1"
 )
 
 type GreeterService struct {
 	proto.UnimplementedEchoServiceServer
 }
 
-func (s *GreeterService) Echo(ctx context.Context, req *proto.EchoRequest) (*proto.EchoReply, error) {
-	return &proto.EchoReply{Message: fmt.Sprintf("%s comes from here", req.GetMessage())}, nil
+func (s *GreeterService) Echo(ctx context.Context, req *proto.EchoRequest) (*proto.EchoResponse, error) {
+	return &proto.EchoResponse{Message: fmt.Sprintf("%s comes from here", req.GetMessage())}, nil
 }
 
 func newHost(t *testing.T, listen multiaddr.Multiaddr) host.Host {

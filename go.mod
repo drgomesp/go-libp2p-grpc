@@ -3,9 +3,7 @@ module github.com/drgomesp/go-libp2p-grpc
 go 1.19
 
 require (
-	github.com/golang/protobuf v1.5.2
-	github.com/grpc-ecosystem/grpc-gateway v1.5.0
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.11.3
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.6.0
 	github.com/libp2p/go-libp2p v0.22.1-0.20220903105754-11279c65c99d
 	github.com/libp2p/go-libp2p-gostream v0.5.0
 	github.com/multiformats/go-multiaddr v0.6.0
@@ -33,6 +31,7 @@ require (
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/mock v1.6.0 // indirect
+	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/gopacket v1.1.19 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
 	github.com/huin/goupnp v1.0.3 // indirect
@@ -98,6 +97,7 @@ require (
 	golang.org/x/sys v0.0.0-20220829200755-d48e67d00261 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/tools v0.1.12 // indirect
+	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.2.0 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	lukechampine.com/blake3 v1.1.7 // indirect

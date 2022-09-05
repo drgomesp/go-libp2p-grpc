@@ -11,15 +11,15 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 
 	libp2pgrpc "github.com/drgomesp/go-libp2p-grpc"
-	"github.com/drgomesp/go-libp2p-grpc/examples/echo/proto"
+	"github.com/drgomesp/go-libp2p-grpc/proto/v1"
 )
 
 type EchoService struct {
 	proto.UnimplementedEchoServiceServer
 }
 
-func (s *EchoService) Echo(context.Context, *proto.EchoRequest) (*proto.EchoReply, error) {
-	return &proto.EchoReply{
+func (s *EchoService) Echo(context.Context, *proto.EchoRequest) (*proto.EchoResponse, error) {
+	return &proto.EchoResponse{
 		Message: "heyo!",
 	}, nil
 }
