@@ -10,7 +10,6 @@ import (
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/libp2p/go-libp2p"
-	gostream "github.com/libp2p/go-libp2p-gostream"
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/peerstore"
 	"github.com/multiformats/go-multiaddr"
@@ -113,9 +112,6 @@ func TestGrpcGateway(t *testing.T) {
 
 	assert.NoError(t, err)
 	assert.Equal(t, "some message comes from here", res.Message)
-
-	listener, _ := gostream.Listen(srvHost, libp2pgrpc.ProtocolID)
-	defer listener.Close()
 
 	go func() {
 		http.ListenAndServe(":4000", mux)

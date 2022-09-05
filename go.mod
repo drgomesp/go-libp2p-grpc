@@ -7,7 +7,6 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/libp2p/go-libp2p v0.22.1-0.20220903105754-11279c65c99d
 	github.com/libp2p/go-libp2p-gostream v0.5.0
-	github.com/libp2p/go-libp2p-http v0.4.0
 	github.com/multiformats/go-multiaddr v0.6.0
 	github.com/stretchr/testify v1.8.0
 	google.golang.org/genproto v0.0.0-20220902135211-223410557253
