@@ -10,6 +10,7 @@
 ## Table of Contents
 
 - [Install](#install)
+- [Features](#features)
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [License](#license)
@@ -19,6 +20,11 @@
 ```bash
 go get github.com/drgomesp/go-libp2p-grpc
 ```
+
+## Features
+
+- GRPC/Protobuf support for any Libp2p **`host.Host`**
+- GRPC Gateway and OpenAPI support through **[`go-libp2p-http`](https://github.com/libp2p/)**
 
 ## Usage
 
