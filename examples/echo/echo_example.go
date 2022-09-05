@@ -21,7 +21,6 @@ type EchoService struct {
 func (s *EchoService) Echo(context.Context, *proto.EchoRequest) (*proto.EchoReply, error) {
 	return &proto.EchoReply{
 		Message: "heyo!",
-		PeerId:  "123",
 	}, nil
 }
 

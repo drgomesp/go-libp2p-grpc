@@ -4,6 +4,8 @@ package echosvc.pb;
 
 option go_package = "github.com/drgomesp/go-libp2p-grpc/proto/examples/echo/proto";
 
+import "google/api/annotations.proto";
+
 // EchoRequest is the argument to the Echo call.
 message EchoRequest {
   // Message is the message to echo.
@@ -13,11 +15,13 @@ message EchoRequest {
 message EchoReply {
   // Message is the message that was requested, echo'd back.
   string message = 1;
-  // PeerId is the peer that responded.
-  string peer_id = 2;
 }
 
 service EchoService {
   // Echo asks a node to respond with a message.
-  rpc Echo(EchoRequest) returns (EchoReply) {}
+  rpc Echo(EchoRequest) returns (EchoReply) {
+    option (google.api.http) = {
+        get: "/v1/example/echo"
+    };
+  }
 }

@@ -1,2 +1,4 @@
 version: v1
 name: buf.build/drgomesp/go-libp2p-grpc
+deps:
+  - buf.build/googleapis/googleapis
