@@ -46,47 +46,65 @@ func main() {
 	m1, _ := multiaddr.NewMultiaddr("/ip4/127.0.0.1/tcp/10000")
 	m2, _ := multiaddr.NewMultiaddr("/ip4/127.0.0.1/tcp/10001")
 
-	serverHost, err := libp2p.New(libp2p.ListenAddrs(m1))
+	h1, err := libp2p.New(libp2p.ListenAddrs(m1))
+	check(err)
+
+	h2, err := libp2p.New(libp2p.ListenAddrs(m2))
+	check(err)
+
+	defer h2.Close()
+	defer h1.Close()
+
+	h1.Peerstore().AddAddrs(h2.ID(), h2.Addrs(), peerstore.PermanentAddrTTL)
+	h2.Peerstore().AddAddrs(h1.ID(), h1.Addrs(), peerstore.PermanentAddrTTL)
+
+	ch := make(chan bool, 1)
+
+	go func() {
+		// initialize h1 as grpc server
+		srv, err := libp2pgrpc.NewGrpcServer(ctx, h1)
+		check(err)
+		proto.RegisterNodeServiceServer(srv, &NodeService{host: h1})
+
+		// h2 will act as the grpc client here, dialing the h1 server
+		client := libp2pgrpc.NewClient(h2, libp2pgrpc.ProtocolID, libp2pgrpc.WithServer(srv))
+		conn, err := client.Dial(ctx, h1.ID(), grpc.WithTransportCredentials(insecure.NewCredentials()))
+		check(err)
+
+		mux := runtime.NewServeMux()
+		err = proto.RegisterNodeServiceHandler(ctx, mux, conn)
+		check(err)
+
+		addrStr := ":4000"
+		log.Printf("node=%s url=http://localhost%s/v1/node/info\n", h1.ID().String(), addrStr)
+		log.Fatal(http.ListenAndServe(addrStr, mux))
+	}()
+
+	go func() {
+		// initialize h1 as grpc server
+		srv, err := libp2pgrpc.NewGrpcServer(ctx, h2)
+		check(err)
+		proto.RegisterNodeServiceServer(srv, &NodeService{host: h2})
+
+		// h1 will act as the grpc client here, dialing the h2 server
+		client := libp2pgrpc.NewClient(h1, libp2pgrpc.ProtocolID, libp2pgrpc.WithServer(srv))
+		conn, err := client.Dial(ctx, h2.ID(), grpc.WithTransportCredentials(insecure.NewCredentials()))
+		check(err)
+
+		mux := runtime.NewServeMux()
+		err = proto.RegisterNodeServiceHandler(ctx, mux, conn)
+		check(err)
+
+		addrStr := ":4001"
+		log.Printf("node=%s url=http://localhost%s/v1/node/info\n", h2.ID().String(), addrStr)
+		log.Fatal(http.ListenAndServe(addrStr, mux))
+	}()
+
+	<-ch
+}
+
+func check(err error) {
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	clientHost, err := libp2p.New(libp2p.ListenAddrs(m2))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	defer clientHost.Close()
-	defer serverHost.Close()
-
-	serverHost.Peerstore().AddAddrs(clientHost.ID(), clientHost.Addrs(), peerstore.PermanentAddrTTL)
-	clientHost.Peerstore().AddAddrs(serverHost.ID(), serverHost.Addrs(), peerstore.PermanentAddrTTL)
-
-	srv, err := libp2pgrpc.NewGrpcServer(ctx, serverHost)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	proto.RegisterNodeServiceServer(srv, &NodeService{host: serverHost})
-	client := libp2pgrpc.NewClient(clientHost, libp2pgrpc.ProtocolID, libp2pgrpc.WithServer(srv))
-	conn, err := client.Dial(ctx, serverHost.ID(), grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	//c := proto.NewNodeServiceClient(conn)
-	//res, err := c.Info(ctx, &proto.InfoRequest{})
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-
-	mux := runtime.NewServeMux()
-	err = proto.RegisterNodeServiceHandler(ctx, mux, conn)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	addr := "localhost:4000"
-	log.Printf("Visit http://%s/v1/node/info\n", addr)
-	log.Fatal(http.ListenAndServe(addr, mux))
 }
