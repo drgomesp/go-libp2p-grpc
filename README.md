@@ -5,7 +5,7 @@
 [![build](https://github.com/drgomesp/go-libp2p-grpc/actions/workflows/go-test.yml/badge.svg?style=squared)](https://github.com/drgomesp/go-libp2p-grpc/actions)
 [![codecov](https://codecov.io/gh/drgomesp/go-libp2p-grpc/branch/main/graph/badge.svg?token=BRMFJRJV2X)](https://codecov.io/gh/drgomesp/go-libp2p-grpc)
 
-> ⚙ GRPC/Protobuf on Libp2p.
+> ⚙ gRPC/Protobuf on Libp2p with gRPC-Gateway support.
 
 ## Table of Contents
 
@@ -29,7 +29,7 @@ go get github.com/drgomesp/go-libp2p-grpc
 ## Usage
 
 
-> For a working example, check the **[examples/](https://github.com/drgomesp/go-libp2p-grpc/tree/main/examples)** folder.
+> For a working example with gRPC-gateway support, check the **[examples/](https://github.com/drgomesp/go-libp2p-grpc/tree/main/examples)** folder.
 
 Given an RPC service:
 
@@ -65,7 +65,7 @@ if err != nil {
 }
 ```
 
-Register the GRPC service to the host server:
+Register the gRPC service to the host server:
 ```go
 pb.RegisterEchoServiceServer(srv, &EchoService{})
 ```
