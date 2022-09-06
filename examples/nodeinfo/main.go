@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"sort"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/libp2p/go-libp2p"
@@ -24,9 +25,16 @@ type NodeService struct {
 }
 
 // Info returns information about the node service's underlying host.
-func (s *NodeService) Info(context.Context, *proto.InfoRequest) (*proto.InfoResponse, error) {
-	return &proto.InfoResponse{
-		PeerId: s.host.ID().String(),
+func (s *NodeService) Info(context.Context, *proto.NodeInfoRequest) (*proto.NodeInfoResponse, error) {
+
+	peers := make([]string, 0)
+	for _, peer := range s.host.Peerstore().Peers() {
+		peers = append(peers, peer.ShortString())
+	}
+	sort.Strings(peers)
+
+	return &proto.NodeInfoResponse{
+		Id: s.host.ID().String(),
 		Addresses: func() []string {
 			res := make([]string, 0)
 
@@ -37,6 +45,7 @@ func (s *NodeService) Info(context.Context, *proto.InfoRequest) (*proto.InfoResp
 			return res
 		}(),
 		Protocols: s.host.Mux().Protocols(),
+		Peers:     peers,
 	}, nil
 }
 
@@ -61,6 +70,8 @@ func main() {
 	ch := make(chan bool, 1)
 
 	go func() {
+		log.Printf("initializing %s", h1.ID().ShortString())
+
 		// initialize h1 as grpc server
 		srv, err := libp2pgrpc.NewGrpcServer(ctx, h1)
 		check(err)
@@ -81,6 +92,8 @@ func main() {
 	}()
 
 	go func() {
+		log.Printf("initializing %s", h2.ID().ShortString())
+
 		// initialize h1 as grpc server
 		srv, err := libp2pgrpc.NewGrpcServer(ctx, h2)
 		check(err)

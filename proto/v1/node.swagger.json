@@ -24,7 +24,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1InfoResponse"
+              "$ref": "#/definitions/v1NodeInfoResponse"
             }
           },
           "default": {
@@ -68,10 +68,10 @@
         }
       }
     },
-    "v1InfoResponse": {
+    "v1NodeInfoResponse": {
       "type": "object",
       "properties": {
-        "peerId": {
+        "id": {
           "type": "string"
         },
         "addresses": {
@@ -81,6 +81,12 @@
           }
         },
         "protocols": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "peers": {
           "type": "array",
           "items": {
             "type": "string"

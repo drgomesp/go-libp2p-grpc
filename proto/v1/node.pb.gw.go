@@ -32,7 +32,7 @@ var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
 func request_NodeService_Info_0(ctx context.Context, marshaler runtime.Marshaler, client NodeServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq InfoRequest
+	var protoReq NodeInfoRequest
 	var metadata runtime.ServerMetadata
 
 	msg, err := client.Info(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -41,7 +41,7 @@ func request_NodeService_Info_0(ctx context.Context, marshaler runtime.Marshaler
 }
 
 func local_request_NodeService_Info_0(ctx context.Context, marshaler runtime.Marshaler, server NodeServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq InfoRequest
+	var protoReq NodeInfoRequest
 	var metadata runtime.ServerMetadata
 
 	msg, err := server.Info(ctx, &protoReq)

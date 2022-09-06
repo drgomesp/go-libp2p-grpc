@@ -23,7 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type NodeServiceClient interface {
 	// Echo asks a node to respond with a message.
-	Info(ctx context.Context, in *InfoRequest, opts ...grpc.CallOption) (*InfoResponse, error)
+	Info(ctx context.Context, in *NodeInfoRequest, opts ...grpc.CallOption) (*NodeInfoResponse, error)
 }
 
 type nodeServiceClient struct {
@@ -34,8 +34,8 @@ func NewNodeServiceClient(cc grpc.ClientConnInterface) NodeServiceClient {
 	return &nodeServiceClient{cc}
 }
 
-func (c *nodeServiceClient) Info(ctx context.Context, in *InfoRequest, opts ...grpc.CallOption) (*InfoResponse, error) {
-	out := new(InfoResponse)
+func (c *nodeServiceClient) Info(ctx context.Context, in *NodeInfoRequest, opts ...grpc.CallOption) (*NodeInfoResponse, error) {
+	out := new(NodeInfoResponse)
 	err := c.cc.Invoke(ctx, "/proto.v1.NodeService/Info", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -48,7 +48,7 @@ func (c *nodeServiceClient) Info(ctx context.Context, in *InfoRequest, opts ...g
 // for forward compatibility
 type NodeServiceServer interface {
 	// Echo asks a node to respond with a message.
-	Info(context.Context, *InfoRequest) (*InfoResponse, error)
+	Info(context.Context, *NodeInfoRequest) (*NodeInfoResponse, error)
 	mustEmbedUnimplementedNodeServiceServer()
 }
 
@@ -56,7 +56,7 @@ type NodeServiceServer interface {
 type UnimplementedNodeServiceServer struct {
 }
 
-func (UnimplementedNodeServiceServer) Info(context.Context, *InfoRequest) (*InfoResponse, error) {
+func (UnimplementedNodeServiceServer) Info(context.Context, *NodeInfoRequest) (*NodeInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Info not implemented")
 }
 func (UnimplementedNodeServiceServer) mustEmbedUnimplementedNodeServiceServer() {}
@@ -73,7 +73,7 @@ func RegisterNodeServiceServer(s grpc.ServiceRegistrar, srv NodeServiceServer) {
 }
 
 func _NodeService_Info_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(InfoRequest)
+	in := new(NodeInfoRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func _NodeService_Info_Handler(srv interface{}, ctx context.Context, dec func(in
 		FullMethod: "/proto.v1.NodeService/Info",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NodeServiceServer).Info(ctx, req.(*InfoRequest))
+		return srv.(NodeServiceServer).Info(ctx, req.(*NodeInfoRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
