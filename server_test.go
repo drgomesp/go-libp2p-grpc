@@ -29,9 +29,9 @@ type NodeInfoService struct {
 }
 
 // Info returns information about the node service's underlying host.
-func (s *NodeInfoService) Info(context.Context, *proto.InfoRequest) (*proto.InfoResponse, error) {
-	return &proto.InfoResponse{
-		PeerId:    s.host.ID().String(),
+func (s *NodeInfoService) Info(context.Context, *proto.NodeInfoRequest) (*proto.NodeInfoResponse, error) {
+	return &proto.NodeInfoResponse{
+		Id:        s.host.ID().String(),
 		Addresses: addresses(s),
 		Protocols: s.host.Mux().Protocols(),
 	}, nil
@@ -87,10 +87,10 @@ func TestGrpc(t *testing.T) {
 	defer conn.Close()
 
 	c := proto.NewNodeServiceClient(conn)
-	res, err := c.Info(ctx, &proto.InfoRequest{})
+	res, err := c.Info(ctx, &proto.NodeInfoRequest{})
 
 	assert.NoError(t, err)
-	assert.Equal(t, srvHost.ID().String(), res.PeerId)
+	assert.Equal(t, srvHost.ID().String(), res.Id)
 	assert.Equal(t, addresses(svc), res.Addresses)
 	assert.Equal(t, srvHost.Mux().Protocols(), res.Protocols)
 }
@@ -129,10 +129,10 @@ func TestGrpcGateway(t *testing.T) {
 	assert.NoError(t, err)
 
 	c := proto.NewNodeServiceClient(conn)
-	res, err := c.Info(ctx, &proto.InfoRequest{})
+	res, err := c.Info(ctx, &proto.NodeInfoRequest{})
 
 	assert.NoError(t, err)
-	assert.Equal(t, srvHost.ID().String(), res.PeerId)
+	assert.Equal(t, srvHost.ID().String(), res.Id)
 	assert.Equal(t, addresses(svc), res.Addresses)
 	assert.Equal(t, srvHost.Mux().Protocols(), res.Protocols)
 
@@ -145,15 +145,16 @@ func TestGrpcGateway(t *testing.T) {
 	)
 	assert.NoError(t, err)
 
-	expected := &proto.InfoResponse{
-		PeerId:    srvHost.ID().String(),
+	expected := &proto.NodeInfoResponse{
+		Id:        srvHost.ID().String(),
 		Addresses: addresses(svc),
 		Protocols: srvHost.Mux().Protocols(),
+		Peers:     []string{},
 	}
 	data, err := io.ReadAll(response.Body)
 	assert.NoError(t, err)
 
-	var actualResponse *proto.InfoResponse
+	var actualResponse *proto.NodeInfoResponse
 	err = json.Unmarshal(data, &actualResponse)
 	assert.NoError(t, err)
 
@@ -185,7 +186,7 @@ func TestGrpcBadProtocol(t *testing.T) {
 	assert.NotNil(t, conn)
 
 	c := proto.NewNodeServiceClient(conn)
-	res, err := c.Info(ctx, &proto.InfoRequest{})
+	res, err := c.Info(ctx, &proto.NodeInfoRequest{})
 
 	assert.Nil(t, res)
 	assert.Error(t, err)

@@ -26,7 +26,6 @@ type NodeService struct {
 
 // Info returns information about the node service's underlying host.
 func (s *NodeService) Info(context.Context, *proto.NodeInfoRequest) (*proto.NodeInfoResponse, error) {
-
 	peers := make([]string, 0)
 	for _, peer := range s.host.Peerstore().Peers() {
 		peers = append(peers, peer.ShortString())
