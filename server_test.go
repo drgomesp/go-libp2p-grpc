@@ -1,7 +1,6 @@
 package libp2pgrpc_test
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"io"
@@ -151,14 +150,14 @@ func TestGrpcGateway(t *testing.T) {
 		Addresses: addresses(svc),
 		Protocols: srvHost.Mux().Protocols(),
 	}
-	expectedData, err := json.Marshal(expected)
-	var buf bytes.Buffer
-	assert.NoError(t, json.Compact(&buf, expectedData))
-	assert.NoError(t, err)
-
 	data, err := io.ReadAll(response.Body)
 	assert.NoError(t, err)
-	assert.Equal(t, string(expectedData), string(data))
+
+	var actualResponse *proto.InfoResponse
+	err = json.Unmarshal(data, &actualResponse)
+	assert.NoError(t, err)
+
+	assert.Equal(t, expected, actualResponse)
 }
 
 func TestGrpcBadProtocol(t *testing.T) {

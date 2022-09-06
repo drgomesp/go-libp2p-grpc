@@ -33,7 +33,7 @@ jobs:
         #   https://github.com/actions/virtual-environments/blob/main/images/win/Windows2019-Readme.md#shells
         # If we prepend its location to the PATH
         #   subsequent 'shell: bash' steps will use msys2 instead of gitbash
-        run: nodeinfo "C:/msys64/usr/bin" >> $GITHUB_PATH
+        run: echo "C:/msys64/usr/bin" >> $GITHUB_PATH
       - name: Run repo-specific setup
         uses: ./.github/actions/go-test-setup
         if: hashFiles('./.github/actions/go-test-setup') != ''
@@ -60,7 +60,7 @@ jobs:
           run: go test -v -race ./...
       - name: Collect coverage files
         shell: bash
-        run: nodeinfo "COVERAGES=$(find . -type f -name 'module-coverage.txt' | tr -s '\n' ',' | sed 's/,$//')" >> $GITHUB_ENV
+        run: echo "COVERAGES=$(find . -type f -name 'module-coverage.txt' | tr -s '\n' ',' | sed 's/,$//')" >> $GITHUB_ENV
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@81cd2dc8148241f03f5839d295e000b8f761e378 # v3.1.0
         with:
