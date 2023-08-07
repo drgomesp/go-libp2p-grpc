@@ -20,21 +20,20 @@ type Server struct {
 // and protocol.
 func NewGrpcServer(ctx context.Context, h host.Host, opts ...grpc.ServerOption) (*Server, error) {
 	grpcServer := grpc.NewServer(opts...)
-
 	srv := &Server{
 		host: h,
 		ctx:  ctx,
 		grpc: grpcServer,
 	}
-
-	listener, err := gostream.Listen(srv.host, ProtocolID)
-	if err != nil {
-		return nil, err
-	}
-
-	go srv.grpc.Serve(listener)
-
 	return srv, nil
+}
+
+func (s *Server) Serve() error {
+	listener, err := gostream.Listen(s.host, ProtocolID)
+	if err != nil {
+		return err
+	}
+	return s.grpc.Serve(listener)
 }
 
 func (s *Server) RegisterService(serviceDesc *grpc.ServiceDesc, srv interface{}) {
