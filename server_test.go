@@ -12,6 +12,7 @@ import (
 	"github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/peerstore"
+	"github.com/libp2p/go-libp2p/core/protocol"
 	"github.com/multiformats/go-multiaddr"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
@@ -33,7 +34,7 @@ func (s *NodeInfoService) Info(context.Context, *proto.NodeInfoRequest) (*proto.
 	return &proto.NodeInfoResponse{
 		Id:        s.host.ID().String(),
 		Addresses: addresses(s),
-		Protocols: s.host.Mux().Protocols(),
+		Protocols: protocol.ConvertToStrings(s.host.Mux().Protocols()),
 	}, nil
 }
 
@@ -148,7 +149,7 @@ func TestGrpcGateway(t *testing.T) {
 	expected := &proto.NodeInfoResponse{
 		Id:        srvHost.ID().String(),
 		Addresses: addresses(svc),
-		Protocols: srvHost.Mux().Protocols(),
+		Protocols: protocol.ConvertToStrings(srvHost.Mux().Protocols()),
 		Peers:     []string{},
 	}
 	data, err := io.ReadAll(response.Body)
