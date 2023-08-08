@@ -12,6 +12,7 @@ import (
 	"github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/peerstore"
+	"github.com/libp2p/go-libp2p/core/protocol"
 	"github.com/multiformats/go-multiaddr"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
@@ -33,7 +34,7 @@ func (s *NodeInfoService) Info(context.Context, *proto.NodeInfoRequest) (*proto.
 	return &proto.NodeInfoResponse{
 		Id:        s.host.ID().String(),
 		Addresses: addresses(s),
-		Protocols: s.host.Mux().Protocols(),
+		Protocols: protocol.ConvertToStrings(s.host.Mux().Protocols()),
 	}, nil
 }
 
@@ -80,6 +81,7 @@ func TestGrpc(t *testing.T) {
 	assert.NoError(t, err)
 	svc := &NodeInfoService{host: srvHost}
 	proto.RegisterNodeServiceServer(srv, svc)
+	go srv.Serve()
 
 	client := libp2pgrpc.NewClient(cliHost, libp2pgrpc.ProtocolID, libp2pgrpc.WithServer(srv))
 	conn, err := client.Dial(ctx, srvHost.ID(), grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -92,7 +94,7 @@ func TestGrpc(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, srvHost.ID().String(), res.Id)
 	assert.Equal(t, addresses(svc), res.Addresses)
-	assert.Equal(t, srvHost.Mux().Protocols(), res.Protocols)
+	assert.Equal(t, protocol.ConvertToStrings(srvHost.Mux().Protocols()), res.Protocols)
 }
 
 func TestGrpcGateway(t *testing.T) {
@@ -118,6 +120,7 @@ func TestGrpcGateway(t *testing.T) {
 	assert.NoError(t, err)
 	svc := &NodeInfoService{host: srvHost}
 	proto.RegisterNodeServiceServer(srv, svc)
+	go srv.Serve()
 
 	client := libp2pgrpc.NewClient(cliHost, libp2pgrpc.ProtocolID, libp2pgrpc.WithServer(srv))
 	conn, err := client.Dial(ctx, srvHost.ID(), grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -134,7 +137,7 @@ func TestGrpcGateway(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, srvHost.ID().String(), res.Id)
 	assert.Equal(t, addresses(svc), res.Addresses)
-	assert.Equal(t, srvHost.Mux().Protocols(), res.Protocols)
+	assert.Equal(t, protocol.ConvertToStrings(srvHost.Mux().Protocols()), res.Protocols)
 
 	go func() {
 		http.ListenAndServe(":4000", mux)
@@ -148,7 +151,7 @@ func TestGrpcGateway(t *testing.T) {
 	expected := &proto.NodeInfoResponse{
 		Id:        srvHost.ID().String(),
 		Addresses: addresses(svc),
-		Protocols: srvHost.Mux().Protocols(),
+		Protocols: protocol.ConvertToStrings(srvHost.Mux().Protocols()),
 		Peers:     []string{},
 	}
 	data, err := io.ReadAll(response.Body)
@@ -179,6 +182,7 @@ func TestGrpcBadProtocol(t *testing.T) {
 	srv, err := libp2pgrpc.NewGrpcServer(ctx, srvHost)
 	assert.NoError(t, err)
 	proto.RegisterNodeServiceServer(srv, &NodeInfoService{host: srvHost})
+	go srv.Serve()
 
 	client := libp2pgrpc.NewClient(cliHost, "/bad/proto")
 	conn, err := client.Dial(ctx, srvHost.ID(), grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -190,5 +194,5 @@ func TestGrpcBadProtocol(t *testing.T) {
 
 	assert.Nil(t, res)
 	assert.Error(t, err)
-	assert.Equal(t, "rpc error: code = Unavailable desc = connection error: desc = \"transport: Error while dialing protocol not supported\"", err.Error())
+	assert.Equal(t, "rpc error: code = Unavailable desc = connection error: desc = \"transport: Error while dialing: failed to negotiate protocol: protocols not supported: [/bad/proto]\"", err.Error())
 }
