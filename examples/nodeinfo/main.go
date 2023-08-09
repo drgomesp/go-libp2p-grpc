@@ -10,6 +10,7 @@ import (
 	"github.com/libp2p/go-libp2p"
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/peerstore"
+	"github.com/libp2p/go-libp2p/core/protocol"
 	"github.com/multiformats/go-multiaddr"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -43,7 +44,7 @@ func (s *NodeService) Info(context.Context, *proto.NodeInfoRequest) (*proto.Node
 
 			return res
 		}(),
-		Protocols: s.host.Mux().Protocols(),
+		Protocols: protocol.ConvertToStrings(s.host.Mux().Protocols()),
 		Peers:     peers,
 	}, nil
 }
@@ -76,6 +77,8 @@ func main() {
 		check(err)
 		proto.RegisterNodeServiceServer(srv, &NodeService{host: h1})
 
+		go srv.Serve()
+
 		// h2 will act as the grpc client here, dialing the h1 server
 		client := libp2pgrpc.NewClient(h2, libp2pgrpc.ProtocolID, libp2pgrpc.WithServer(srv))
 		conn, err := client.Dial(ctx, h1.ID(), grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -97,6 +100,8 @@ func main() {
 		srv, err := libp2pgrpc.NewGrpcServer(ctx, h2)
 		check(err)
 		proto.RegisterNodeServiceServer(srv, &NodeService{host: h2})
+
+		go srv.Serve()
 
 		// h1 will act as the grpc client here, dialing the h2 server
 		client := libp2pgrpc.NewClient(h1, libp2pgrpc.ProtocolID, libp2pgrpc.WithServer(srv))

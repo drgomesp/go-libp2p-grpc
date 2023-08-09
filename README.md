@@ -70,6 +70,11 @@ Register the gRPC service to the host server:
 pb.RegisterEchoServiceServer(srv, &EchoService{})
 ```
 
+Start gRPC for serve:
+```go
+go srv.Serve()
+```
+
 A libp2p host to act as the client:
 ```go
 ma, _ := multiaddr.NewMultiaddr("/ip4/127.0.0.1/tcp/10001")
