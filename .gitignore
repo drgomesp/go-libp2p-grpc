@@ -25,3 +25,6 @@ _testmain.go
 dist/
 
 dist/
+
+.vscode/
+*.out
