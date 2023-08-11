@@ -122,8 +122,7 @@ func main() {
 
 		// ha will act as the grpc client here, dialing the h2 server
 		client := libp2pgrpc.NewClient(ha, libp2pgrpc.ProtocolID)
-		// opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-		opts := []grpc.DialOption{grpc.WithBlock(), grpc.WithTimeout(time.Second * 3600), grpc.WithTransportCredentials(insecure.NewCredentials())}
+		opts := []grpc.DialOption{grpc.WithBlock(), grpc.WithTransportCredentials(insecure.NewCredentials())}
 		conn, err := client.Dial(ctx, info.ID, opts...)
 		check(err)
 
